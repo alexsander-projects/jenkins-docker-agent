@@ -25,26 +25,28 @@ The Docker agent container will use a custom Docker image; the dockerfile can be
 
 - Deploy the resources using terraform.
 
-- On the `agentVm`, edit the `docker.service` file to open `port 4243` allowing tcp connection: `remember to be on the right directory`
+On the `agentVm`, edit the `docker.service` file to open `port 4243` allowing tcp connection: `remember to be on the right directory`
 
-`sudo vi usr/lib/systemd/system/docker.service`
+    sudo vi usr/lib/systemd/system/docker.service
 
 modify the current line: 
 
->`ExecStart=/usr/bin/dockerd -H tcp://0.0.0.0:4243 -H unix:///var/run/docker.sock`
+`ExecStart=/usr/bin/dockerd -H tcp://0.0.0.0:4243 -H unix:///var/run/docker.sock`
 
 ![](https://github.com/nokorinotsubasa/project-docker-agent/blob/1388f56c3cfcb3e2416d5c6383ab16a9b3cc3d6c/images/dockerserviceModification.png)
 
 
-- Restart docker services:
+Restart docker services:
 
-`sudo systemctl daemon-reload`
+    sudo systemctl daemon-reload
 
-`sudo systemctl restart docker`
+and
+
+    sudo systemctl restart docker
 
 you can test the connection using the other Vm:
 
-`curl http://<agentvmip>:4243/version`
+    curl http://<agentvmip>:4243/version
 
 ![](https://github.com/nokorinotsubasa/project-docker-agent/blob/1388f56c3cfcb3e2416d5c6383ab16a9b3cc3d6c/images/curlTest.png)
 
