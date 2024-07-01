@@ -1,4 +1,5 @@
 #!/bin/bash
+# This script will install jenkins on the master vm
 cd /
 sudo yum install git-all -y
 sudo yum install -y yum-utils 
