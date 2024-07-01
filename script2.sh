@@ -1,4 +1,5 @@
 #!/bin/bash
+# This script will install and change docker configuration on agent vm
 cd /
 sudo yum install git-all -y
 sudo yum install -y yum-utils 
