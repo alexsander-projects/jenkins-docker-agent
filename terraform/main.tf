@@ -13,7 +13,7 @@ terraform {
 
 provider "azurerm" {
   features {}
-  subscription_id = "e27798f8-f902-4c7e-bd09-8adec2444619" # Replace with your Azure subscription ID
+  subscription_id = "<your_subscription_id_here>" # Replace with your Azure subscription ID
 }
 
 provider "random" {
