@@ -16,7 +16,7 @@ The Docker agent container will use a custom Docker image; the dockerfile can be
 
 ## Notes about terraform
 
-- Don't forget to change `terraform.tfvars` to set vm admin username, etc;
+- Don't forget to change `terraform.tfvars` to set vm admin username, etc.;
 
 - The Virtual machines password will NOT be on the output, instead they can be securely found in the `terraform.tfstate` file;
 

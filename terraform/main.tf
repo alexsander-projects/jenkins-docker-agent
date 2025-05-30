@@ -147,9 +147,10 @@ resource "azurerm_virtual_machine_extension" "masterVm" {
   publisher            = var.vm_extension.publisher
   type                 = var.vm_extension.type
   type_handler_version = var.vm_extension.type_handler_version
-
-  protected_settings = var.vm_extension.protected_settings
-  depends_on         = [azurerm_linux_virtual_machine.masterVm]
+  protected_settings   = jsonencode({
+    script           = base64encode(file("../script.sh")) // Assumes script.sh is in the parent directory
+  })
+  depends_on           = [azurerm_linux_virtual_machine.masterVm]
 }
 
 #Linux Virtual Machine
@@ -183,13 +184,14 @@ resource "azurerm_linux_virtual_machine" "agentVm2" {
 #Virtual Machine Extension
 resource "azurerm_virtual_machine_extension" "agentVm" {
   name                 = var.vm_extension.name
-  virtual_machine_id   = azurerm_linux_virtual_machine.agentVm2.id
+  virtual_machine_id   = azurerm_linux_virtual_machine.masterVm.id
   publisher            = var.vm_extension.publisher
   type                 = var.vm_extension.type
   type_handler_version = var.vm_extension.type_handler_version
-
-  protected_settings = var.vm_extension.protected_settings2
-  depends_on         = [azurerm_linux_virtual_machine.agentVm2]
+  protected_settings   = jsonencode({
+    script           = base64encode(file("../script2.sh")) // Assumes script2.sh is in the parent directory
+  })
+  depends_on           = [azurerm_linux_virtual_machine.masterVm]
 }
 
 #Random string
