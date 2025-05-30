@@ -4,7 +4,7 @@
 
 Here we will learn how to spin up a Docker container as a Jenkins build agent.
 
-![](https://github.com/nokorinotsubasa/project-docker-agent/blob/0b0d399f94731fb376a0ec5675af6ed972fc379f/images/Architecture.png)
+![](images/Architecture.png)
 
 We will use terraform for resource deployments.
 
@@ -33,7 +33,7 @@ modify the current line:
 
 `ExecStart=/usr/bin/dockerd -H tcp://0.0.0.0:4243 -H unix:///var/run/docker.sock`
 
-![](https://github.com/nokorinotsubasa/project-docker-agent/blob/1388f56c3cfcb3e2416d5c6383ab16a9b3cc3d6c/images/dockerserviceModification.png)
+![](images/dockerserviceModification.png)
 
 
 Restart docker services:
@@ -48,13 +48,13 @@ you can test the connection using the other Vm:
 
     curl http://<agentvmip>:4243/version
 
-![](https://github.com/nokorinotsubasa/project-docker-agent/blob/1388f56c3cfcb3e2416d5c6383ab16a9b3cc3d6c/images/curlTest.png)
+![](images/curlTest.png)
 
 >`the ip was censored`
 
 - Proceed with the basic jenkins installation on the `master Vm`. You will need to install the `Docker plugin`:
 
-![](https://github.com/nokorinotsubasa/project-docker-agent/blob/1388f56c3cfcb3e2416d5c6383ab16a9b3cc3d6c/images/JenkinsInititalSetup.png)
+![](images/JenkinsInititalSetup.png)
 
 >`masterVm running Jenkins master`
 
@@ -64,7 +64,7 @@ you can test the connection using the other Vm:
 
 >`tcp://<agentvmIp>:4243`
 
-![](https://github.com/nokorinotsubasa/project-docker-agent/blob/1388f56c3cfcb3e2416d5c6383ab16a9b3cc3d6c/images/NewCloudConfiguration.png)
+![](images/NewCloudConfiguration.png)
 
 >`the ip was censored`
 
@@ -81,7 +81,7 @@ you can test the connection using the other Vm:
 
 - Set the `"Remote File system Root"` as `/home/ubuntu`:
 
-![](https://github.com/nokorinotsubasa/project-docker-agent/blob/1388f56c3cfcb3e2416d5c6383ab16a9b3cc3d6c/images/DockerAgentTemplateConfiguration.png)
+![](images/DockerAgentTemplateConfiguration.png)
 
 - On the connect method option choose connect with ssh;
 
@@ -95,7 +95,7 @@ you can test the connection using the other Vm:
 
 >`this is not recommended and will be done just for demonstration`
 
-![](https://github.com/nokorinotsubasa/project-docker-agent/blob/1388f56c3cfcb3e2416d5c6383ab16a9b3cc3d6c/images/DockerAgentTemplateSSHConfiguration.png)
+![](images/DockerAgentTemplateSSHConfiguration.png)
 
 >`final configuration`
 
@@ -105,16 +105,15 @@ In case of a `pipeline script`, set as:
 
 - E.g.
 
-![](https://github.com/nokorinotsubasa/project-docker-agent/blob/1388f56c3cfcb3e2416d5c6383ab16a9b3cc3d6c/images/pipelineScript.png)
+![](images/pipelineScript.png)
 
 - As you can see, a new docker container was deployed, it was used to run the pipeline, and then was destroyed:
 
-![](https://github.com/nokorinotsubasa/project-docker-agent/blob/1388f56c3cfcb3e2416d5c6383ab16a9b3cc3d6c/images/docker-agent-pipeline.png)
+![](images/docker-agent-pipeline.png)
 
 >`Running on docker-agent-00000kac0e5xb on docker-agent in /home/ubuntu/workspace/docker-agent-pipeline`
 
 - If you head into `Cloud statistics`, you can check some information on the agents:
 
-![](https://github.com/nokorinotsubasa/project-docker-agent/blob/1388f56c3cfcb3e2416d5c6383ab16a9b3cc3d6c/images/Jenkins%20Cloud%20Statistics.png)
+![](images/Jenkins%20Cloud%20Statistics.png)
 
-Here, we defined docker to spin up a container which will be used as a `Jenkins agent`.
