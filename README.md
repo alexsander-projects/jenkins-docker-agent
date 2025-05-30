@@ -1,6 +1,20 @@
 # Jenkins Docker container agent
 
-## Introduction 
+## Table of Contents
+- [Introduction](#introduction)
+- [Notes about Terraform](#notes-about-terraform)
+- [Prerequisites](#prerequisites)
+- [Steps](#steps)
+  - [Deploy Resources](#deploy-resources)
+  - [Configure Docker on Agent VM](#configure-docker-on-agent-vm)
+  - [Install Jenkins and Docker Plugin](#install-jenkins-and-docker-plugin)
+  - [Configure Jenkins Cloud](#configure-jenkins-cloud)
+  - [Configure Docker Agent Template](#configure-docker-agent-template)
+  - [Configure Pipeline](#configure-pipeline)
+  - [Verify Setup](#verify-setup)
+- [Cloud Statistics](#cloud-statistics)
+
+## Introduction
 
 Here we will learn how to spin up a Docker container as a Jenkins build agent.
 
@@ -14,104 +28,134 @@ Both Vms have script extensions to configure basic dependencies upon creation.
 
 The Docker agent container will use a custom Docker image; the dockerfile can be found in this repository.
 
-## Notes about terraform
+## Notes about Terraform
 
 - Don't forget to change `terraform.tfvars` to set vm admin username, etc.;
 
 - The Virtual machines password will NOT be on the output, instead they can be securely found in the `terraform.tfstate` file;
 
+## Prerequisites
+
+Before you begin, ensure you have the following:
+
+* Terraform installed.
+* A Docker Hub account (or other Docker registry) 
+_if you plan to use custom Docker images._
 
 ## Steps
 
-- Deploy the resources using terraform.
+### Deploy Resources
 
-On the `agentVm`, edit the `docker.service` file to open `port 4243` allowing tcp connection: `remember to be on the right directory`
+1.  **Deploy the resources using Terraform.**
+    *   Don't forget to change `terraform.tfvars` to set VM admin username, etc.
+    *   The Virtual Machine passwords will NOT be in the output; they can be securely found in the `terraform.tfstate` file.
 
-    sudo vi usr/lib/systemd/system/docker.service
+### Configure Docker on Agent VM
 
-modify the current line: 
+2.  **Edit the `docker.service` file on the `agentVm` to open port `4243` for TCP connections.**
+    *   Navigate to the correct directory: `usr/lib/systemd/system/`.
+    *   Open the `docker.service` file for editing:
+        ```bash
+        sudo vi /usr/lib/systemd/system/docker.service
+        ```
+    *   Modify the `ExecStart` line to include the TCP host:
+        `ExecStart=/usr/bin/dockerd -H tcp://0.0.0.0:4243 -H unix:///var/run/docker.sock`
 
-`ExecStart=/usr/bin/dockerd -H tcp://0.0.0.0:4243 -H unix:///var/run/docker.sock`
+    ![](images/dockerserviceModification.png)
 
-![](images/dockerserviceModification.png)
-
-
-Restart docker services:
-
+3.  **Restart Docker services:**
+    ```bash
     sudo systemctl daemon-reload
-
-and
-
     sudo systemctl restart docker
+    ```
 
-you can test the connection using the other Vm:
-
+4.  **Test the connection from the `masterVm` (or another VM on the same network):**
+    ```bash
     curl http://<agentvmip>:4243/version
+    ```
+    ![](images/curlTest.png)
+    > `the ip was censored`
 
-![](images/curlTest.png)
+### Install Jenkins and Docker Plugin
 
->`the ip was censored`
+5.  **Proceed with the basic Jenkins installation on the `masterVm`.**
+    *   You will need to install the **Docker plugin**.
 
-- Proceed with the basic jenkins installation on the `master Vm`. You will need to install the `Docker plugin`:
+    ![](images/JenkinsInititalSetup.png)
+    > `masterVm running Jenkins master`
 
-![](images/JenkinsInititalSetup.png)
+### Configure Jenkins Cloud
 
->`masterVm running Jenkins master`
+6.  **Navigate to `Manage Jenkins > Clouds` and add a new cloud of type Docker.**
 
-- Head to `Manage Jenkins > Clouds`, add a new cloud of type docker;
+7.  **Configure the Docker Host URL.**
+    *   In the "Docker Host URI" field, insert the agent VM URL:
+        `tcp://<agentvmIp>:4243`
 
-- On the docker host url, insert the agent vm url as follows:
+    ![](images/NewCloudConfiguration.png)
+    > `the ip was censored`
+    *   Test the connection.
+    *   Enable the configuration.
+    *   Ensure "Expose DOCKER_HOST" is checked if needed by your jobs.
 
->`tcp://<agentvmIp>:4243`
+8.  **Set the container cap (the maximum number of concurrent containers Jenkins can run).**
 
-![](images/NewCloudConfiguration.png)
+### Configure Docker Agent Template
 
->`the ip was censored`
+9.  **In the Docker Cloud configuration, go to "Docker Agent Templates" and add a new template.**
 
-- Test the connection and enable it, also expose `DOCKER_HOST`;
+10. **Set the Label and Name for the template.** This label will be used in your Jenkins jobs to specify that they should run on an agent from this template.
 
-- Set the container cap;
+11. **Configure the Docker Image.**
+    *   For the "Docker Image" option, specify the image you want to use. In this example, a custom Docker image is used:
+        `nokorinotsubasa/agent175:v5`
 
-- Now on `docker template`, add a new template;
+12. **Set the "Remote File System Root" to `/home/ubuntu` (or the appropriate home directory inside your agent container).**
 
-- Set the label and name;
+    ![](images/DockerAgentTemplateConfiguration.png)
 
-- On the docker image option set the image you want to use, in our case we will use a custom docker image:
-`nokorinotsubasa/agent175:v5`
+13. **Configure the Connection Method.**
+    *   Choose "Connect with SSH".
+    *   For "SSH Key," select "Use configured SSH credentials."
 
-- Set the `"Remote File system Root"` as `/home/ubuntu`:
+14. **Add Credentials.**
+    *   Click "Add" next to "Credentials" and choose "Username with password."
+    *   Set Username to `jenkins` and Password to `jenkins`. (These credentials were defined in the custom Docker image used for the agent).
 
-![](images/DockerAgentTemplateConfiguration.png)
+15. **Set Host Key Verification Strategy.**
+    *   Choose "Non-verifying Verification Strategy."
+    > **Caution:** This is not recommended for production environments and is used here for demonstration purposes only.
 
-- On the connect method option choose connect with ssh;
+    ![](images/DockerAgentTemplateSSHConfiguration.png)
+    > `final configuration`
 
-- On `ssh key`, select `"Use configured SSH credentials"`;
+### Configure Pipeline
 
-- On credential, add an `"Username and password"` type of credentials;
+16. **Configure your Jenkins job to use the Docker agent.**
+    *   **For a Freestyle project:**
+        *   In the project configuration, check "Restrict where this project can be run."
+        *   Enter the label you defined in the Docker Agent Template (e.g., `docker-agent`).
+    *   **For a Pipeline script:**
+        *   Use the `agent` directive with the label:
+          ```groovy
+          agent {
+              label 'your-label-name' // Replace 'your-label-name' with the actual label
+          }
+          ```
+    *   E.g.
+        ![](images/pipelineScript.png)
 
-- Set username as `jenkins` and password as `jenkins`, this was defined on the custom docker image which will run the docker agent;
+### Verify Setup
 
-- On Host key Verification Strategy, choose `"Non verifying Verification Strategy"`;
+17. **Run your Jenkins job.**
+    *   You should see a new Docker container being deployed on the `agentVm`.
+    *   The pipeline will run inside this container.
+    *   After the job completes, the container should be automatically destroyed.
 
->`this is not recommended and will be done just for demonstration`
+    ![](images/docker-agent-pipeline.png)
+    > `Running on docker-agent-00000kac0e5xb on docker-agent in /home/ubuntu/workspace/docker-agent-pipeline`
 
-![](images/DockerAgentTemplateSSHConfiguration.png)
-
->`final configuration`
-
-- That's it, now on the `freestyle pipeline` configuration, set the `"Restrict where this build can run"` with the name of the label you defined on the docker template configuration.
-In case of a `pipeline script`, set as:
-`"agent {label 'label'}"`
-
-- E.g.
-
-![](images/pipelineScript.png)
-
-- As you can see, a new docker container was deployed, it was used to run the pipeline, and then was destroyed:
-
-![](images/docker-agent-pipeline.png)
-
->`Running on docker-agent-00000kac0e5xb on docker-agent in /home/ubuntu/workspace/docker-agent-pipeline`
+## Cloud Statistics
 
 - If you head into `Cloud statistics`, you can check some information on the agents:
 
