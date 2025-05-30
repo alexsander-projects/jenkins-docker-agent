@@ -2,7 +2,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "3.65.0"
+      version = "4.14.0"
     }
     random = {
       source  = "hashicorp/random"
@@ -13,6 +13,7 @@ terraform {
 
 provider "azurerm" {
   features {}
+  subscription_id = "<your_subscription_id_here>" # Replace with your Azure subscription ID
 }
 
 provider "random" {

@@ -32,6 +32,15 @@ The Docker agent container will use a custom Docker image; the dockerfile can be
 
 - Don't forget to change `terraform.tfvars` to set vm admin username, etc.;
 
+- Also, ensure you set the Subscription ID in the `main.tf` file:
+
+```hcl
+provider "azurerm" {
+  features {}
+  subscription_id = "<your-subscription-id>"
+}
+```
+
 - The Virtual machines password will NOT be on the output, instead they can be securely found in the `terraform.tfstate` file;
 
 ## Prerequisites
