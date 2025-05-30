@@ -57,8 +57,15 @@ _if you plan to use custom Docker images._
 
 1.  **Deploy the resources using Terraform.**
     *   Don't forget to change `terraform.tfvars` to set VM admin username, etc.
+    *   Run the following commands in the terminal:
+        ```bash
+        terraform init
+        terraform plan
+        terraform apply
+        ```
     *   The Virtual Machine passwords will NOT be in the output; they can be securely found in the `terraform.tfstate` file.
 
+> script extensions will be executed on the VMs to install basic dependencies, such as Docker, these scripts can be found in the root of this repository.
 ### Configure Docker on Agent VM
 
 2.  **Edit the `docker.service` file on the `agentVm` to open port `4243` for TCP connections.**
