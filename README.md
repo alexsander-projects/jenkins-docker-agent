@@ -131,8 +131,7 @@ Use `docker logs jenkins` to get the initial admin password.
 10. **Set the Label and Name for the template.** This label will be used in your Jenkins jobs to specify that they should run on an agent from this template.
 
 11. **Configure the Docker Image.**
-    *   For the "Docker Image" option, specify the image you want to use. In this example, a custom Docker image is used:
-        `nokorinotsubasa/agent175:v5`
+    *   For the "Docker Image" option, specify the image you want to use.
 
 12. **Set the "Remote File System Root" to `/home/ubuntu` (or the appropriate home directory inside your agent container).**
 
@@ -144,8 +143,7 @@ Use `docker logs jenkins` to get the initial admin password.
 
 14. **Add Credentials.**
     *   Click "Add" next to "Credentials" and choose "Username with password."
-    *   Set Username to `jenkins` and Password to `jenkins`. (These credentials were defined in the custom Docker image used for the agent).
-
+    
 15. **Set Host Key Verification Strategy.**
     *   Choose "Non-verifying Verification Strategy."
     > **Caution:** This is not recommended for production environments and is used here for demonstration purposes only.
