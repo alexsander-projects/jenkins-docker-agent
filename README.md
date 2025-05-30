@@ -135,8 +135,6 @@ Use `docker logs jenkins` to get the initial admin password.
 
 12. **Set the "Remote File System Root" to `/home/ubuntu` (or the appropriate home directory inside your agent container).**
 
-    ![](images/DockerAgentTemplateConfiguration.png)
-
 13. **Configure the Connection Method.**
     *   Choose "Connect with SSH".
     *   For "SSH Key," select "Use configured SSH credentials."
