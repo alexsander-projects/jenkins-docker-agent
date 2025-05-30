@@ -68,11 +68,13 @@ _if you plan to use custom Docker images._
 > script extensions will be executed on the VMs to install basic dependencies, such as Docker, these scripts can be found in the root of this repository.
 ### Configure Docker on Agent VM
 
+* Log into the `agentVm` (the VM that will run the Docker agent container) using SSH or any other method you prefer.
+
 2.  **Edit the `docker.service` file on the `agentVm` to open port `4243` for TCP connections.**
     *   Navigate to the correct directory: `usr/lib/systemd/system/`.
     *   Open the `docker.service` file for editing:
         ```bash
-        sudo vi /usr/lib/systemd/system/docker.service
+        sudo vi docker.service
         ```
     *   Modify the `ExecStart` line to include the TCP host:
         `ExecStart=/usr/bin/dockerd -H tcp://0.0.0.0:4243 -H unix:///var/run/docker.sock`
@@ -95,7 +97,13 @@ _if you plan to use custom Docker images._
 ### Install Jenkins and Docker Plugin
 
 5.  **Proceed with the basic Jenkins installation on the `masterVm`.**
-    *   You will need to install the **Docker plugin**.
+> jenkins will be running on a Docker container due to the extension script.
+
+So just head to the http://`<masterVmIp>`:8080 and follow the instructions to set up Jenkins.
+
+Use `docker logs jenkins` to get the initial admin password.
+    
+*   You will need to install the **Docker plugin**.
 
     ![](images/JenkinsInititalSetup.png)
     > `masterVm running Jenkins master`

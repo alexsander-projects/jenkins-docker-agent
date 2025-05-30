@@ -13,7 +13,7 @@ terraform {
 
 provider "azurerm" {
   features {}
-  subscription_id = "<your_subscription_id_here>" # Replace with your Azure subscription ID
+  subscription_id = "<SUBSCRIPTION_ID>" # Replace with your Azure subscription ID
 }
 
 provider "random" {
@@ -141,7 +141,7 @@ resource "azurerm_linux_virtual_machine" "masterVm" {
   }
 }
 
-#Virtual Machine Extension
+#Virtual Machine Extension Master
 resource "azurerm_virtual_machine_extension" "masterVm" {
   name                 = var.vm_extension.name
   virtual_machine_id   = azurerm_linux_virtual_machine.masterVm.id
@@ -182,17 +182,17 @@ resource "azurerm_linux_virtual_machine" "agentVm2" {
   depends_on = [azurerm_public_ip.agentip]
 }
 
-#Virtual Machine Extension
+#Virtual Machine Extension Agent
 resource "azurerm_virtual_machine_extension" "agentVm" {
   name                 = var.vm_extension.name
-  virtual_machine_id   = azurerm_linux_virtual_machine.masterVm.id
+  virtual_machine_id   = azurerm_linux_virtual_machine.agentVm2.id
   publisher            = var.vm_extension.publisher
   type                 = var.vm_extension.type
   type_handler_version = var.vm_extension.type_handler_version
   protected_settings   = jsonencode({
     script           = base64encode(file("../script2.sh")) // Assumes script2.sh is in the parent directory
   })
-  depends_on           = [azurerm_linux_virtual_machine.masterVm]
+  depends_on           = [azurerm_linux_virtual_machine.agentVm2]
 }
 
 #Random string

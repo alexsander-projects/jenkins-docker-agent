@@ -3,7 +3,7 @@
 #resource group
 resource_group = {
   location = "east us"
-  name     = "jenkins-rg"
+  name     = "jenkins-rg" # Replace with your resource group name
 }
 
 #virtual network
@@ -81,29 +81,4 @@ source_image_reference = {
 #vms secrets
 vm_secrets = {
   admin_username = "<admin_username>" # Replace with your admin username
-}
-
-#vms extension
-vm_extension = {
-  name                 = "script"
-  publisher            = "Microsoft.Azure.Extensions"
-  type                 = "CustomScript"
-  type_handler_version = "2.0"
-  protected_settings2 = <<PROTECTED_SETTINGS
-    {
-          "commandToExecute": "sh script2.sh",
-          "storageAccountName": "terraformbackend5167",
-          "storageAccountKey": "<storageAccountKey>",
-          "fileUris": ["<fileUris>"]
-    }
- PROTECTED_SETTINGS
-  protected_settings   = <<PROTECTED_SETTINGS
-    {
-          "commandToExecute": "sh script2.sh",
-          "storageAccountName": "terraformbackend5167",
-          "storageAccountKey": "<storageAccountKey>",
-          "fileUris": ["<fileUris>"]
-    }
- PROTECTED_SETTINGS
-
 }
