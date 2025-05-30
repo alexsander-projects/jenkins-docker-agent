@@ -80,7 +80,7 @@ source_image_reference = {
 
 #vms secrets
 vm_secrets = {
-  admin_username = ""
+  admin_username = "<admin_username>" # Replace with your admin username
 }
 
 #vms extension
